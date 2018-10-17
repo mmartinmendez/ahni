@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:mega",
+    "configuration": "cpu=atmega2560",
+    "sketch": "ad hoc/data/Robot-master/Robot-master.ino",
+    "port": "/dev/ttyACM0"
+}

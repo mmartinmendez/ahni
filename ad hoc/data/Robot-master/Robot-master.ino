@@ -71,7 +71,7 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
 char ssid[] = "DBabu";
 char password[] = "12345678";
-char ip[] = {192,168,43,251};
+char ip[] = {192,168,43,250};
 char slaveip[]={192,168,43,99};
 
 //gnrl ip = 192.168.43.251
@@ -92,10 +92,20 @@ long RSSI_Value = 0;
 PacketSerial packetSerial;
 //WiFiUDP wifiudp;
 
-uint8_t dat[2];
+uint8_t a[2];
+
+//Custom variables
+//Timers in ms
+uint8_t startTimer = 0;
+uint8_t endTimer = 1000;
+uint8_t sendTimerInit = 0;
+uint8_t sendTimer = 5000;
+uint8_t rssiBuffer[10];
+uint8_t rssiCounter = 0;
+
 
 //Handle commands. USER CAN ADD MODE COMMANDS IF NECESSARY
-void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uint8_t fwd, uint8_t counterH, uint8_t counterL, uint8_t datalen, uint8_t command, uint8_t *data)
+void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uint8_t fwd, uint8_t counterH, uint8_t counterL, uint8_t aalen, uint8_t command, uint8_t *data)
 {
 
     uint8_t tempData[32] = {0};
@@ -518,6 +528,9 @@ sendIP();
 delay(1000);
 sendSSIDandPassword();
 
+startTimer = millis();
+sendTimerInit = millis();
+
 //WiFi UDP Setup
 //wifiudp.begin(slaveip,3333);
 //wifiudp.setupUDP(slaveip,3333);
@@ -532,9 +545,19 @@ sendSSIDandPassword();
 }
 
 bool once = true;
+uint8_t sam = 0;
 void loop() 
 {
   packetSerial.update();
+  Serial.print(getDistanceFront());
+  // if(millis()-startTimer >= endTimer) {
+  //   startTimer = 0;
+  //   getRSSI();
+  // }
+  // if(millis() - sendTimerInit >= sendTimer) {
+  //   sendTimerInit = 0;
+  //   Serial.println(RSSI_Value);
+  // }
 }
 /** USER FUNCTION FOR AD-HOC NETWORKS COURSE. Create function and send over WiFi network
 src -> ID of robot. Send nodeID variable here (This is don't care for TCP packet)
