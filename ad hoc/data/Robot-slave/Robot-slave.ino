@@ -63,7 +63,7 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {1,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0},
                                       {0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,1},
                                       {0,1,0,0,0,1,1,0,0,1,0,0,0,0,1,0},
-                                      {1,0,0,0,0,0,0,1,0,1,0,1,0,1,0,0},
+                                      {1,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0},
                                       {1,1,0,0,0,0,1,0,1,0,1,0,0,0,1,0},
                                       {0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,1},
                                       {0,1,0,0,0,1,0,0,0,1,1,0,0,1,0,0},
@@ -515,6 +515,9 @@ long m_CDist=0;
 uint8_t m_IRSSI=0;
 uint8_t m_CRSSI=0;
 
+//2nd exp variables
+long basic_diff=0;
+
 //Initial setup
 void setup() 
 {
@@ -606,10 +609,24 @@ void mISSI(uint8_t data)
 {
   m_IRSSI=data;
   m_IDist=getDist(m_IRSSI);
+  basic_diff = s_IDist - m_IDist;
 }
 
 void perform(uint8_t data)
 {
   m_CRSSI=data;
   m_CDist=getDist(m_CRSSI);
+  if(m_CDist != m_IDist)
+  {
+    long m_diff = m_IDist - m_CDist;
+    if(m_diff>0)
+    {
+      long req = s_IDist - m_diff;
+    }
+    else
+    {
+      long req = s_IDist + m_diff;
+    }
+
+  }
 }
