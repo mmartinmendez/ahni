@@ -41,6 +41,8 @@
 #define DISTANCEFRONT 0x0A
 #define GETHEADING 0x0D 
 #define GETID 0x0F
+#define GET_mCRSSI 0xA1
+#define GET_mIRSSI 0xA2
 
 //Internal commands, communicated with ESP32
 #define INT_ID 0x01
@@ -140,6 +142,13 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
                   tempData[1] = nodeID;
                   sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
                   break; 
+
+      case GET_mIRSSI:  mISSI(*data);
+                        break;
+
+      case GET_mCRSSI:  perform(*data);
+                        break;
+
     }
   }
 
@@ -494,6 +503,18 @@ void sendPacket(uint8_t src, uint8_t dst, uint8_t internal, uint8_t isTCP, uint8
  packetSerial.send(packet,8+index);
 }
 
+//current - slave variables initialisation
+long s_IDist=0;
+long s_CDist=0;
+uint8_t s_IRSSI=0;
+uint8_t s_CRSSI=0;
+
+//master variables initialisation
+long m_IDist=0;
+long m_CDist=0;
+uint8_t m_IRSSI=0;
+uint8_t m_CRSSI=0;
+
 //Initial setup
 void setup() 
 {
@@ -513,6 +534,11 @@ delay(1000);
 sendIP();
 delay(1000);
 sendSSIDandPassword();
+
+//get rssi
+getRSSI();
+s_IRSSI=RSSI_Value;
+s_IDist=getDist(s_IRSSI);
 
 //WiFi UDP Setup
 //wifiudp.begin(masterip,3333);
@@ -566,6 +592,24 @@ void OnReceive(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uint8_t 
   if(tcp == ADHOC && nodeID == dst)
   { 
       handleCommands(src, dst, internal, tcp, fwd, counterH, counterL, datalen, command, data);
-      CreatePacket(nodeID,1, ADHOC,datalen,data);
+      //CreatePacket(nodeID,1, ADHOC,datalen,data);
   }
+}
+
+//2nd exp
+long getDist(uint8_t d_rssi)
+{
+
+}
+
+void mISSI(uint8_t data)
+{
+  m_IRSSI=data;
+  m_IDist=getDist(m_IRSSI);
+}
+
+void perform(uint8_t data)
+{
+  m_CRSSI=data;
+  m_CDist=getDist(m_CRSSI);
 }
