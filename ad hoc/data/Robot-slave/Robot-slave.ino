@@ -566,6 +566,6 @@ void OnReceive(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uint8_t 
   if(tcp == ADHOC && nodeID == dst)
   { 
       handleCommands(src, dst, internal, tcp, fwd, counterH, counterL, datalen, command, data);
-      //CreatePacket(nodeID,1, ADHOC,datalen,data);
+      CreatePacket(nodeID,1, ADHOC,datalen,data);
   }
 }
