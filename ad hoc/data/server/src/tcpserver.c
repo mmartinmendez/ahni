@@ -119,6 +119,7 @@ int main(int argc , char *argv[])
         printf("  9. Get RSSI value\n");
         printf("  10. Get ID\n");
         printf("  11. Execute commands from file (cmd_file.txt)\n");
+        printf("  12. Send RSSI value\n");
         printf(" Waiting for user input : "); 
 
         scanf("%d",&cmd_val);        
@@ -177,6 +178,9 @@ int main(int argc , char *argv[])
                 break;
             case 11:
                 read_file();
+                break;
+            case 12:
+                printf("Sending RSSI value\n");
                 break;
             default:
                 printf("Unknown command received\n");

@@ -41,6 +41,7 @@
 #define DISTANCEFRONT 0x0A
 #define GETHEADING 0x0D 
 #define GETID 0x0F
+#define SENDRSSI 0x0E
 
 //Internal commands, communicated with ESP32
 #define INT_ID 0x01
@@ -83,6 +84,7 @@ long Rssi = 0;
 unsigned long distance = 0;
 
 uint8_t nodeID = 0;
+uint8_t slaveID = 1;
 uint8_t movementTime = 0;
 uint16_t tempMovementTime = 0;
 
@@ -96,11 +98,11 @@ uint8_t a[2];
 
 //Custom variables
 //Timers in ms
-uint8_t startTimer = 0;
-uint8_t endTimer = 1000;
-uint8_t sendTimerInit = 0;
-uint8_t sendTimer = 5000;
-uint8_t rssiBuffer[10];
+unsigned long startTimer = 0;
+unsigned long endTimer = 10;
+unsigned long sendTimerInit = 0;
+unsigned long sendTimer = 2000;
+uint8_t rssiBuffer[20];
 uint8_t rssiCounter = 0;
 
 
@@ -114,6 +116,8 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
     {
       case MOVEFORWARD : Command = MOVEFORWARD;
                          moveForward();
+                         getRSSI();
+                         sendRSSI(nodeID, slaveID, 0);
                          break;
 
       case MOVEFORWARDTIME: moveForwardForTime(*data);
@@ -154,6 +158,11 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
                   tempData[1] = nodeID;
                   sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
                   break; 
+      
+      case SENDRSSI:
+        getRSSI(); 
+        sendRSSI(nodeID, slaveID, 0);
+        break;
     }
   }
 
@@ -367,6 +376,11 @@ void getRSSI()
   //RSSI value is updated in RSS_Value variable as soon as there is reply from ESP32. This is implemented in OnPacket() function
 }
 
+void sendRSSI(uint8_t src, uint8_t dst, uint8_t connection) 
+{
+  CreatePacket(src, dst, connection,(int8_t)sizeof(long), RSSI_Value);
+}
+
 //This is internal API used to enable demo mode in ESP32. Demo mode should be enabled in all the robots to make it work
 void enableDemo()
 {
@@ -513,7 +527,7 @@ void sendPacket(uint8_t src, uint8_t dst, uint8_t internal, uint8_t isTCP, uint8
 void setup() 
 {
 Serial.begin(115200);
-//setID(15);
+setID(9);
 nodeID = getID();
 packetSerial.setPacketHandler(&onPacket);
 packetSerial.begin(115200);
@@ -545,18 +559,25 @@ sendTimerInit = millis();
 }
 
 bool once = true;
-uint8_t sam = 0;
+uint8_t i = 0;
+
 void loop() 
 {
   packetSerial.update();
-  Serial.print(getDistanceFront());
   // if(millis()-startTimer >= endTimer) {
-  //   startTimer = 0;
+  //   startTimer = millis();
   //   getRSSI();
+  //   rssiBuffer[i++] = RSSI_Value;
   // }
   // if(millis() - sendTimerInit >= sendTimer) {
-  //   sendTimerInit = 0;
-  //   Serial.println(RSSI_Value);
+    // sendRSSI(nodeID, slaveID, 0);
+    // i = 0;
+    // sendTimerInit = millis();
+    // for(uint8_t j = 0; j<20 ; j++) {
+    //   Serial.print(rssiBuffer[j]);
+    //   Serial.print(" ");
+    // }
+  //   Serial.println("");
   // }
 }
 /** USER FUNCTION FOR AD-HOC NETWORKS COURSE. Create function and send over WiFi network
