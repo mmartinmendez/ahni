@@ -527,7 +527,7 @@ void sendPacket(uint8_t src, uint8_t dst, uint8_t internal, uint8_t isTCP, uint8
 void setup() 
 {
 Serial.begin(115200);
-setID(9);
+setID(1);
 nodeID = getID();
 packetSerial.setPacketHandler(&onPacket);
 packetSerial.begin(115200);
