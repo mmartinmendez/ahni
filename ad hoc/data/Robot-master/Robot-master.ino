@@ -28,7 +28,7 @@
 
 
 #define TIMER1COUNT 64286  //50Hz
-#define TIMER3COUNT 64286  //50Hz
+#define TIMER3COUNT 65536  //1Hz
 
 //External commands, communicated with another robot (in Adhoc mode) or TCP
 #define NOCOMMAND 0
@@ -42,7 +42,6 @@
 #define DISTANCEFRONT 0x0A
 #define GETHEADING 0x0D 
 #define GETID 0x0F
-#define SENDRSSI 0x0E
 #define REINITIALIZE 0x11
 #define SET_MODE2 0x12
 #define SET_MODE3 0x13
@@ -77,9 +76,9 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {1,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0},
                                       {0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
-char ssid[] = "telenet-3A790";
-char password[] = "wmdnzGtrvfw6";
-char ip[] = {192,168,0,205};
+char ssid[] = "DBabu";
+char password[] = "12345678";
+char ip[] = {192,168,43,250};
 // char slaveip[]={192,168,0,1};
 
 //gnrl ip = 192.168.43.251
@@ -123,8 +122,8 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
     switch(command)
     {
       case MOVEFORWARD : Command = MOVEFORWARD;
-                         moveForward();
-                         break;
+                        moveForward();
+                        break;
 
       case MOVEFORWARDTIME: moveForwardForTime(*data);
                             break;
@@ -165,11 +164,6 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
                   sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
                   break; 
       
-      case SENDRSSI:
-        getRSSI(); 
-        sendRSSI(nodeID, slaveID, 0);
-        break;
-      
       case REINITIALIZE:
         break;
       
@@ -209,12 +203,7 @@ ISR(TIMER3_OVF_vect)
 {
   long time = millis();
 
-  switch(Mode)
-  {
-    case Mode2:
-    case Mode3:
-      break;
-  }
+  sendRSSI(nodeID, 1, ADHOC);
 
   TCNT3 = TIMER3COUNT;
 }
@@ -412,14 +401,15 @@ void turnRight(uint8_t data)
 void getRSSI()
 {
   uint8_t data;
-  // CreatePacket(nodeID,1,ADHOC,sizeof(value), &value);
   sendPacket(nodeID, nodeID, INT_RSSI, TCP, FWD, 0, 0, 0, &data);
   //RSSI value is updated in RSS_Value variable as soon as there is reply from ESP32. This is implemented in OnPacket() function
 }
 
 void sendRSSI(uint8_t src, uint8_t dst, uint8_t connection) 
 {
-  CreatePacket(src, dst, connection,sizeof(RSSI_Value), &RSSI_Value);
+  getRSSI();
+  uint8_t value = RSSI_Value;
+  CreatePacket(src, dst, connection, sizeof(value), &value);
 }
 
 //This is internal API used to enable demo mode in ESP32. Demo mode should be enabled in all the robots to make it work
