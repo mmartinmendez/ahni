@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/mithun_martin/Downloads/arduino-1.8.7/tools/**",
+                "/home/mithun_martin/Downloads/arduino-1.8.7/hardware/arduino/avr/**",
+                "/home/mithun_martin/Arduino/hardware/espressif/esp32/**"
+            ],
+            "forcedInclude": [
+                "/home/mithun_martin/Downloads/arduino-1.8.7/hardware/arduino/avr/cores/arduino/Arduino.h"
+            ],
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

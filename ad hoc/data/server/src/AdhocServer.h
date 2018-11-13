@@ -48,4 +48,9 @@ void create_packet_ID(char length,char *data,int client_index);
 int send_cmd(int client_sock, char *buf,int size);
 void print_packet(char *buf,int size);
 void read_file();
+
+/* New funtions*/
+void reinitialize(int src, int dst);
+void set_mode2(int src, int dst);
+void set_mode3(int src, int dst);
 #endif

@@ -7,6 +7,7 @@
 #include "CommandList.h" 
 #include "AdhocServer.h"
 
+#define __DEBUG__ 1
 
 /* 
  * Global variables to keep track of src and
@@ -211,6 +212,8 @@ long get_RSSI(int src,int dst) {
     value = get_data(client_message);
 #ifdef __DEBUG__
     printf("%x %x %x %x\n",value[0],value[1],value[2],value[3]);
+    printf("%x %x %x %x\n",value[0]<<24,value[1]<<16,value[2]<<8,value[3]);
+    printf("%d", (value[0] << 24 ) | (value[1] << 16) | (value[2] << 8) | (value[3]));
 #endif
     
     return (value[0] << 24 ) | (value[1] << 16) | (value[2] << 8) | (value[3]);
@@ -436,6 +439,31 @@ int get_index(int val) {
 
 }
 
+void reinitialize(int src, int dst) {
+    char data = REINITIALIZE;
+    create_packet(src,dst,sizeof(data),&data);
+}
+
+/*
+ * Function to create packet to set 
+ * robots to mode 2
+ */
+
+void set_mode2(int src, int dst) {
+    char data = SET_MODE2;
+    create_packet(src,dst,sizeof(data),&data);
+}
+
+/*
+ * Function to create packet to set 
+ * robots to mode 3
+ */
+
+void set_mode3(int src, int dst) {
+    char data = SET_MODE3;
+    create_packet(src,dst,sizeof(data),&data);
+}
+
 
 /* 
  * Function used to create and send the 
@@ -474,6 +502,7 @@ void create_packet(int src,int dst, char length,char *data)
     for(l=0;l<length;l++)
     {
         packet[PACKET_DATA_LOC + 1 + l] = *(data+l);
+        printf("%d\n",*(data+l));
 
     }
 
@@ -481,6 +510,7 @@ void create_packet(int src,int dst, char length,char *data)
 #ifdef __DEBUG__
     printf(" Sending to sockfd %d\n",client_sock[client_index]);
 #endif
+    print_packet(packet, 11+length);
     send_cmd(client_sock[client_index],packet,11 + length);
 
     free(packet);

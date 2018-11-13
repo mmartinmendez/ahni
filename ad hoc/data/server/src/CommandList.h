@@ -64,6 +64,9 @@
 #define GET_RSSI 0x0E
 #define GET_ID 0x0F
 #define SET_ID 0x10
+#define REINITIALIZE 0x11
+#define SET_MODE2 0x12
+#define SET_MODE3 0x13
 
 
 /*

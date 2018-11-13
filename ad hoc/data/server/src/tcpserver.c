@@ -19,8 +19,7 @@
 #include "AdhocServer.h"
 #include "CommandList.h"
 
-
-//#define __DEBUG__ 1
+#define __DEBUG__ 1
 
 unsigned int con_count = 0;
 
@@ -119,7 +118,9 @@ int main(int argc , char *argv[])
         printf("  9. Get RSSI value\n");
         printf("  10. Get ID\n");
         printf("  11. Execute commands from file (cmd_file.txt)\n");
-        printf("  12. Send RSSI value\n");
+        printf("  12. Put Robots into mode 2 (for running exercise 2)\n");
+        printf("  13. Reinitialize\n");
+        printf("  14. Put Robots into mode 3 (for running exercise 3\n)");
         printf(" Waiting for user input : "); 
 
         scanf("%d",&cmd_val);        
@@ -180,7 +181,16 @@ int main(int argc , char *argv[])
                 read_file();
                 break;
             case 12:
-                printf("Sending RSSI value\n");
+                set_mode2(src_id, dst_id);
+                printf("Mode 2 has been initialized. Move the master to make the slave follow. \n");
+                break;
+            case 13:
+                reinitialize(src_id,dst_id);
+                printf("The robots have been set to the default state. \n");
+                break;
+            case 14:
+                set_mode3(src_id, dst_id);
+                printf("Mode 3 has been initialized. The slave will keep the same distance from the AP as the master. \n");
                 break;
             default:
                 printf("Unknown command received\n");
