@@ -14,6 +14,8 @@ extern unsigned long sensorDistance;
 extern long finalSlaveRSSI;
 extern uint8_t Mode;
 extern long RSSI_Value;
+extern uint8_t rssiTime;
+extern uint16_t tempRssiTime;
 
 #define STARTBYTE 0xFF
 #define PACKETSIZE 254
@@ -55,14 +57,12 @@ extern long RSSI_Value;
 #define GETHEADING 0x0D 
 #define GETID 0x0F
 
-#define SETMODE2 0x10
-#define SETMODE3 0x11
+#define SETMODE 0x24
+#define MODE1 0x25
+#define MODE2 0x26
+#define MODE3 0x27
 
-#define MASTERRSSI 0x12
-
-#define MODE1 0x20
-#define MODE2 0x21
-#define MODE3 0x22
+#define MASTERRSSI 0x31
 
 //Internal commands, communicated with ESP32
 #define INT_ID 0x01

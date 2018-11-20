@@ -1,21 +1,26 @@
 #include <stdint.h>
+#include <Arduino.h>
 #include "helpers.h"
 
 long distance[7] = {0,50,100,150,200,250,300};
-long RSSIValues[7] = {-54, -56, -60, -58, -63, -66, -70};
+long RSSIValues[7] = {-40, -46, -55, -58, -63, -66, -70};
 long finalSlaveRSSI = RSSI_Value;
 long finalMasterRSSI = 0;
 uint8_t Mode = 0;
 
 void initialize()
 {
+    rssiTime = 200;
+    getRSSI();
+    tempRssiTime = millis();
+
     if(Mode == MODE2)
     {
-    sensorDistance = getDistanceFront();
-    if(sensorDistance > 254)
-    {
-        sensorDistance = 254;
-    }
+        sensorDistance = getDistanceFront();
+        if(sensorDistance > 254)
+        {
+            sensorDistance = 254;
+        }
     }
     if(Mode == MODE3)
     {
@@ -32,6 +37,8 @@ void calculateDistance()
 {
     for(int i=0;i<6;i++)
     {
+        Serial.println(finalSlaveRSSI);
+        Serial.println("---------");
         if(finalMasterRSSI <= RSSIValues[i] && finalMasterRSSI > RSSIValues[i+1])
         {
             long locationMaster = getLocation(finalMasterRSSI);
@@ -77,5 +84,9 @@ void getNewRSSI(long slave, long master)
             index = i;
         }
     }
+    Serial.println("-----");
+    Serial.println(RSSIValues[index]);
+    Serial.println(RSSIValues[index+1]);
+    Serial.println(ratio);
     finalSlaveRSSI = (RSSIValues[index]-RSSIValues[index+1])/ratio + RSSIValues[index+1];
 }

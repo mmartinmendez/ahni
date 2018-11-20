@@ -20,9 +20,9 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {1,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0},
                                       {0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
-char ssid[] = "DBabu";
-char password[] = "12345678";
-char ip[] = {192,168,43,165};
+char ssid[] = "FRITZ!Box Fon WLAN 7360";
+char password[] = "03642107286265336252";
+char ip[] = {192,168,178,81};
 
 uint8_t Command = 0;
 long Rssi = 0;
@@ -31,6 +31,9 @@ unsigned long sensorDistance = 0;
 uint8_t nodeID = 0;
 uint8_t movementTime = 0;
 uint16_t tempMovementTime = 0;
+
+uint8_t rssiTime = 0;
+uint16_t tempRssiTime = 0;
 
 uint16_t PacketCounter = 0;
 long RSSI_Value = 0;
@@ -91,17 +94,16 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
             break; 
         
-        case SETMODE2:
-            setMode(MODE2);
+        case SETMODE:
+            setMode(data);
+            Serial.println("----Slave---");
+            Serial.println(data[0]);
+            Serial.println("------------");
             initialize();
-            break;
-        
-        case SETMODE3:
-            setMode(MODE3);
             break;
 
         case MASTERRSSI:
-            Serial.println("inside masterrssi");
+            Serial.println(Mode);
             finalMasterRSSI = data;
             Command = MASTERRSSI;
             calculateDistance();
@@ -113,24 +115,33 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
 ISR(TIMER1_OVF_vect)
 {
  
- long time = millis();
+    long time = millis();
 
- switch(Command)
- {
+    switch(Command)
+    {
+        case MOVEFORWARDTIME:
+        case TURNLEFT:
+        case TURNRIGHT:
+        case MOVEBACKTIME:
+            if(((uint16_t)(millis()/1000) - tempMovementTime) >= movementTime)
+            {
+                stopMotors();  
+                Command = NOCOMMAND; 
+            }
+            break;
+        case MASTERRSSI:
+            if(((uint8_t)millis - tempRssiTime) >= rssiTime)
+            {
+                getRSSI();
+                if(RSSI_Value >= finalSlaveRSSI-1 && RSSI_Value <= finalSlaveRSSI+1)
+                {
+                    stopMotors();
+                } 
+                tempRssiTime = millis();
+            }
+    }
 
-  case MOVEFORWARDTIME:
-  case TURNLEFT:
-  case TURNRIGHT:
-  case MOVEBACKTIME:
-  if(((uint16_t)(millis()/1000) - tempMovementTime) >= movementTime)
-                      {
-                        stopMotors();  
-                        Command = NOCOMMAND; 
-                      }
-                     break;
- }
-
- TCNT1 = TIMER1COUNT;
+    TCNT1 = TIMER1COUNT;
 }
 
 void initGPIO()
