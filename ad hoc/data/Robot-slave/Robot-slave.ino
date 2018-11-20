@@ -73,13 +73,13 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
       case TURNRIGHT: turnRight(*data);
                       break;
 
-        case DISTANCEFRONT: distance = getDistanceFront();
-            if(distance > 254)
+        case DISTANCEFRONT: sensorDistance = getDistanceFront();
+            if(sensorDistance > 254)
             {
-                distance = 254;
+                sensorDistance = 254;
             }
             tempData[0] = command;
-            tempData[1] = distance & 0xFF;
+            tempData[1] = sensorDistance & 0xFF;
             tempData[2] = 0;
             sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
             break;
@@ -92,13 +92,13 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
             break; 
         
-        case MODE2:
+        case SETMODE2:
             initialize();
-            setMode(Mode2);
+            setMode(MODE2);
             break;
         
-        case MODE3:
-            setMode(Mode3);
+        case SETMODE3:
+            setMode(MODE3);
             break;
 
         case MASTERRSSI:
@@ -466,6 +466,7 @@ Serial.begin(115200);
 Serial.println("starting robot");
 //setID(15);
 nodeID = getID();
+Mode = MODE1;
 packetSerial.setPacketHandler(&onPacket);
 packetSerial.begin(115200);
 initGPIO();

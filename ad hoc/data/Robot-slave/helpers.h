@@ -2,7 +2,10 @@
 void getRSSI();
 void calculateDistance();
 uint8_t getDistanceFront();
+void initialize();
 void setMode(uint8_t mode);
+long getLocation(long rssi) ;
+void getNewRSSI(long slave, long master);
 
 //Global variables
 extern long RSSIValues[7];
@@ -10,6 +13,7 @@ extern long finalMasterRSSI;
 extern unsigned long sensorDistance;
 extern long finalSlaveRSSI;
 extern uint8_t Mode;
+extern long RSSI_Value;
 
 #define STARTBYTE 0xFF
 #define PACKETSIZE 254
@@ -55,6 +59,10 @@ extern uint8_t Mode;
 #define SETMODE3 0x11
 
 #define MASTERRSSI 0x12
+
+#define MODE1 0x20
+#define MODE2 0x21
+#define MODE3 0x22
 
 //Internal commands, communicated with ESP32
 #define INT_ID 0x01

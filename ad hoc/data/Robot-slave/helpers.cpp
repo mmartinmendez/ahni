@@ -1,8 +1,10 @@
 #include <stdint.h>
+#include "helpers.h"
 
 long distance[7] = {0,50,100,150,200,250,300};
 long RSSIValues[7] = {-54, -56, -60, -58, -63, -66, -70};
 long finalSlaveRSSI = RSSI_Value;
+long finalMasterRSSI = 0;
 uint8_t Mode = 0;
 
 void initialize()
@@ -23,7 +25,7 @@ void calculateDistance()
 {
     for(int i=0;i<6;i++)
     {
-        if(finalMasterRSSI =< RSSIValues[i] && finalMasterRSSI > RSSIValues[i+1])
+        if(finalMasterRSSI <= RSSIValues[i] && finalMasterRSSI > RSSIValues[i+1])
         {
             long locationMaster = getLocation(finalMasterRSSI);
             getRSSI();
@@ -45,11 +47,11 @@ long getLocation(long rssi)
     {
         if(rssi <= RSSIValues[i] && rssi > RSSIValues[i+1])
         {
-            ratio = (RSSI_Value-RSSIValues[i+1])/(RSSIValues[i]-RSSIValues[i+1])
+            ratio = (RSSI_Value-RSSIValues[i+1])/(RSSIValues[i]-RSSIValues[i+1]);
             index = i;
         }
     }
-    location = (distance[index+1]-distance[index])/ratio + distance[i];
+    location = (distance[index+1]-distance[index])/ratio + distance[index];
     return location;
 }
 
@@ -58,12 +60,13 @@ void getNewRSSI(long slave, long master)
     long deltaDistance = slave - master - sensorDistance;
     long finalDistance = slave + deltaDistance;
     int index = 0;
+    double ratio = 0;
     
     for(int i=0;i<6;i++)
     {
         if(finalDistance >= distance[i] && finalDistance < distance[i+1])
         {
-            ratio = (finalDistance-distance[i+1])/(distance[i+1]-distance[i])
+            ratio = (finalDistance-distance[i+1])/(distance[i+1]-distance[i]);
             index = i;
         }
     }

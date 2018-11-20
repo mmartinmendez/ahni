@@ -44,6 +44,7 @@
 #define SET_MODE3 0x13
 #define INITIALIZE 0x18
 #define GETDATA 0x19
+#define GETDISTANCEMS 0x30
 
 #define MODE1 0x14
 #define MODE2 0x15

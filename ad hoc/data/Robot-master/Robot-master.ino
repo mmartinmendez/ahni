@@ -147,6 +147,10 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             // Serial.println(tempData[3]);
             sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, data);
             break;
+        case GETDISTANCEMS:
+            moveForward();
+            tempInitTime = (uint16_t)millis();
+            Command = INITIALIZE;
     }
   }
 

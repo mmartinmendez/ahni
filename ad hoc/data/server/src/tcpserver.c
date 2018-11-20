@@ -203,6 +203,9 @@ int main(int argc , char *argv[])
                 printf("Getting all data\n");
                 get_all_data(src_id, dst_id);
                 break;
+            case 17:
+                printf("Running the bot 50 cms");
+                init_move_distance(src_id, dst_id);
             default:
                 printf("Unknown command received\n");
                 break;

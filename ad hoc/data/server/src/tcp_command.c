@@ -485,6 +485,12 @@ void set_mode3(int src, int dst) {
     create_packet(src,dst,sizeof(data),&data);
 }
 
+void init_move_distance(int src, int dst)
+{
+    char data = 0x30;
+    create_packet(src,dst,sizeof(data), data);
+}
+
 int get_all_data(int src, int dst) {
     int ret = 0;
     unsigned char *value = NULL;
