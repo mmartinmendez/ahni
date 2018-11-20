@@ -1,56 +1,7 @@
 #include <EEPROM.h>
 #include "PacketSerial.h"
+#include "helpers.h"
 //#include "WiFiUdp.h"
-
-#define STARTBYTE 0xFF
-#define PACKETSIZE 254
-#define MINPACKET 8
-#define TCP 0
-#define ADHOC 0
-#define FWD 0
-#define ACK 1
-#define ADDRESS 0
-#define MOTOR_FRONT_LEFT_P  35
-#define MOTOR_FRONT_LEFT_N  33
-#define MOTOR_BACK_LEFT_P  27
-#define MOTOR_BACK_LEFT_N  25
-#define MOTOR_FRONT_RIGHT_P 39
-#define MOTOR_FRONT_RIGHT_N  37
-#define MOTOR_BACK_RIGHT_P  31
-#define MOTOR_BACK_RIGHT_N    29
-#define ULTRASONIC_FRONT_TRIGGER   43
-#define ULTRASONIC_FRONT_ECHO   41
-
-#define REDLED A11
-#define WHITELED 44
-#define YELLOWLED A12
-#define ORANGELED 42
-
-
-#define TIMER1COUNT 64286  //50Hz
-
-//External commands, communicated with another robot (in Adhoc mode) or TCP
-#define NOCOMMAND 0
-#define MOVEFORWARD 0x01
-#define MOVEFORWARDTIME 0x02
-#define MOVEBACK 0x03
-#define MOVEBACKTIME 0x04
-#define TURNLEFT 0x05
-#define TURNRIGHT 0x06
-#define STOP 0x07
-#define DISTANCEFRONT 0x0A
-#define GETHEADING 0x0D 
-#define GETID 0x0F
-
-//Internal commands, communicated with ESP32
-#define INT_ID 0x01
-#define INT_SSID_PWD 0x02
-#define INT_MATRIX 0x03
-#define INT_RSSI 0x04
-#define INT_IP 0x05
-#define INT_DEMO 0x06
-
-#define NODECOUNT 16
 
 //Matrix - Robot ID 0 to ID 15
 uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
@@ -61,8 +12,8 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {1,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0},
                                       {0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,1},
                                       {0,1,0,0,0,1,1,0,0,1,0,0,0,0,1,0},
-                                      {1,0,0,0,0,0,0,1,0,1,0,1,0,1,0,0},
-                                      {1,1,0,0,0,0,1,0,1,0,1,0,0,0,1,0},
+                                      {1,1,0,0,0,0,0,1,1,1,0,1,0,1,0,0},
+                                      {1,1,0,0,0,0,1,0,1,1,1,0,0,0,1,0},
                                       {0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,1},
                                       {0,1,0,0,0,1,0,0,0,1,1,0,0,1,0,0},
                                       {0,1,0,0,0,0,0,1,0,0,0,1,0,1,0,1},
@@ -71,12 +22,12 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
 char ssid[] = "DBabu";
 char password[] = "12345678";
-char ip[] = {192,168,43,165};
+char ip[] = {192,168,178,181};
 char masterip[]={192,168,43,165};
 
 uint8_t Command = 0;
 long Rssi = 0;
-unsigned long distance = 0;
+unsigned long sensorDistance = 0;
 
 uint8_t nodeID = 0;
 uint8_t movementTime = 0;
@@ -122,26 +73,40 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
       case TURNRIGHT: turnRight(*data);
                       break;
 
-      case DISTANCEFRONT: distance = getDistanceFront();
-                          if(distance > 254)
-                          {
-                           distance = 254;
-                          }
-                          tempData[0] = command;
-                          tempData[1] = distance & 0xFF;
-                          tempData[2] = 0;
-                          sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
-                          break;
+        case DISTANCEFRONT: distance = getDistanceFront();
+            if(distance > 254)
+            {
+                distance = 254;
+            }
+            tempData[0] = command;
+            tempData[1] = distance & 0xFF;
+            tempData[2] = 0;
+            sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
+            break;
 
-      case GETHEADING: break;   
+        case GETHEADING: break;   
 
-      case GETID: nodeID = getID();
-                  tempData[0] = command;
-                  tempData[1] = nodeID;
-                  sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
-                  break; 
+        case GETID: nodeID = getID();
+            tempData[0] = command;
+            tempData[1] = nodeID;
+            sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
+            break; 
+        
+        case MODE2:
+            initialize();
+            setMode(Mode2);
+            break;
+        
+        case MODE3:
+            setMode(Mode3);
+            break;
+
+        case MASTERRSSI:
+            finalMasterRSSI = data;
+            calculateDistance();
+            break;
     }
-  }
+}
 
 //Timer 1 interrupt service routine
 ISR(TIMER1_OVF_vect)
