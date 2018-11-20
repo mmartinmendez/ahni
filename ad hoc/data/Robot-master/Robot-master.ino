@@ -22,9 +22,9 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
 
-char ssid[] = "FRITZ!Box Fon 7360 - extended";
-char password[] = "03642107286265336252";
-char ip[] = {192,168,178,180};
+char ssid[] = "DBabu";
+char password[] = "12345678";
+char ip[] = {192,168,43,251};
 
 //gnrl ip = 192.168.43.251
 //bot9 ip = 192.168.43.165

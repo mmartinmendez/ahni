@@ -123,6 +123,7 @@ int main(int argc , char *argv[])
         printf("  14. Put Robots into mode 3 (for running exercise 3\n)");
         printf("  15. Get the mode of the bot\n");
         printf("  16. Get all the data\n");
+        printf("  17. Move the bot 50 cms\n");
         printf(" Waiting for user input : "); 
 
         scanf("%d",&cmd_val);        
@@ -204,8 +205,9 @@ int main(int argc , char *argv[])
                 get_all_data(src_id, dst_id);
                 break;
             case 17:
-                printf("Running the bot 50 cms");
+                printf("Running the bot 50 cms\n");
                 init_move_distance(src_id, dst_id);
+                break;
             default:
                 printf("Unknown command received\n");
                 break;

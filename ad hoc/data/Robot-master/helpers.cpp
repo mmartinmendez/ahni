@@ -10,6 +10,13 @@ int initialized;
 uint16_t tempInitTime = 0;
 uint16_t initTime = 1400;
 
+ISR(TIMER3_OVF_vect) 
+{
+    long time = millis();
+    sendRSSI(nodeID, 1, ADHOC);
+    TCNT3 = TIMER3COUNT;
+}
+
 void reinitialize()
 {
     Mode = MODE1;
@@ -23,14 +30,14 @@ void reinitialize()
 void initializeAdhocMode() 
 {
     //initialize timer 3
-    // noInterrupts();  
-    // TCCR3A = 0;
-    // TCCR3B = 0;
+    noInterrupts();  
+    TCCR3A = 0;
+    TCCR3B = 0;
 
-    // TCNT3 = TIMER3COUNT;
-    // TCCR3B |= (1 << CS12);
-    // TIMSK3 |= (1 << TOIE1);
-    // interrupts();
+    TCNT3 = TIMER3COUNT;
+    TCCR3B |= (1 << CS12);
+    TIMSK3 |= (1 << TOIE1);
+    interrupts();
 
     // if(!initialized) {
         getArray();
@@ -70,13 +77,6 @@ void sendRSSI(uint8_t src, uint8_t dst, uint8_t connection)
     getRSSI();
     uint8_t value = RSSI_Value;
     CreatePacket(src, dst, connection, sizeof(value), &value);
-}
-
-ISR(TIMER3_OVF_vect) 
-{
-    long time = millis();
-    sendRSSI(nodeID, 1, ADHOC);
-    TCNT3 = TIMER3COUNT;
 }
 
 // Get the current data from the bot 
