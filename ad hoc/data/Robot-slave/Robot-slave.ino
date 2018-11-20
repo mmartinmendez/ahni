@@ -102,9 +102,12 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
 
         case MASTERRSSI:
             Serial.println("inside masterrssi");
+
             finalMasterRSSI = data;
             Command = MASTERRSSI;
             calculateDistance();
+            
+            
             break;
     }
 }
@@ -128,6 +131,37 @@ ISR(TIMER1_OVF_vect)
                         Command = NOCOMMAND; 
                       }
                      break;
+  case INITIALIZE:
+  if(((uint16_t)millis() - tempInitTime) >= initTime)
+  {
+    stopMotors();
+    Command = NOCOMMAND;
+  }
+  break;
+  case REQRSSI:
+  long temp_time = millis();
+  if(millis()-temp_time>=200)
+  {
+    getRSSI;
+    temp_time=millis();
+  }
+  if(RSSIchange==0)
+  {
+  if(reqSlaveRSSI-RSSI_Value<=0)
+  {
+    stopMotors();
+    Command=NOCOMMAND;
+  }
+  break;
+  }
+  if(RSSIchange==1)
+  {
+    if(reqSlaveRSSI-RSSI_Value>=0)
+    {
+      stopMotors();
+      Command=NOCOMMAND;
+    }
+  }
  }
 
  TCNT1 = TIMER1COUNT;
