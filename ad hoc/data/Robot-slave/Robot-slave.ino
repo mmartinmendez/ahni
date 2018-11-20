@@ -49,6 +49,8 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
 
     uint8_t tempData[32] = {0};
     data = data + 1;
+    Serial.println(command);
+    Serial.println(SETMODE);
     switch(command)
     {
       case MOVEFORWARD : Command = MOVEFORWARD;
