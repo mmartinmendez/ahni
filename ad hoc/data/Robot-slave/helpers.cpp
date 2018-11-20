@@ -1,9 +1,11 @@
 #include <stdint.h>
 #include "helpers.h"
+#include<Arduino.h>
 
 long distance[6] = {0,50,100,150,200,250};
 long RSSIValues[6] = {-54, -56, -60, -58, -63, -66};
-long RSSIMaster[6]={-52,-60,-60-,60,-65,-72,}
+long RSSIMaster[6] = {-52, -58, -60, -63, -65, -72};
+long RSSIValuesWithDistance[6];
 long finalSlaveRSSI = RSSI_Value;
 long finalMasterRSSI = 0;
 int initialized=0;
@@ -56,8 +58,10 @@ void calculateDistance()
     }
     if(Mode==MODE3)
     {
+        finalMasterRSSI= -70;
         getLocation_mode3(finalMasterRSSI);
-        finalSlaveRSSI= getRSSI();
+        getRSSI();
+        finalSlaveRSSI= RSSI_Value;
         long slaveLocation=getLocation(getRSSI);
         long reqSlavelocation = getLocation(reqSlaveRSSI);
         if(slaveLocation<reqSlavelocation)

@@ -5,18 +5,24 @@ uint8_t getDistanceFront();
 void initialize();
 void setMode(uint8_t mode);
 long getLocation(long rssi) ;
-long getLocation_mode3(long rssi);
+void getLocation_mode3(long rssi);
 void getNewRSSI(long slave, long master);
+void moveForward();
+void moveBack();
 
 //Global variables
-extern long RSSIValues[7];
+extern long RSSIValues[6];
+extern uint8_t tempInitTime;
+extern uint8_t initTime;
+extern long RSSIMaster[6];
 extern long finalMasterRSSI;
 extern unsigned long sensorDistance;
 extern long finalSlaveRSSI;
-long uint8_t RSSIchange;
+extern int RSSIchange;
 extern long reqSlaveRSSI;
 extern uint8_t Mode;
 extern long RSSI_Value;
+extern uint8_t Command;
 
 #define STARTBYTE 0xFF
 #define PACKETSIZE 254
@@ -57,6 +63,7 @@ extern long RSSI_Value;
 #define DISTANCEFRONT 0x0A
 #define GETHEADING 0x0D 
 #define GETID 0x0F
+#define INITIALIZE 0x18
 #define REQRSSI 0x33
 
 #define SETMODE2 0x10

@@ -22,7 +22,7 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
 char ssid[] = "DBabu";
 char password[] = "12345678";
-char ip[] = {192,168,43,165};
+char ip[] = {192,168,43,251};
 
 uint8_t Command = 0;
 long Rssi = 0;
@@ -98,6 +98,7 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
         
         case SETMODE3:
             setMode(MODE3);
+            tempInitTime=(uint8_t)millis();
             break;
 
         case MASTERRSSI:
