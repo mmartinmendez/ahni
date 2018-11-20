@@ -92,8 +92,8 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             break; 
         
         case SETMODE2:
-            initialize();
             setMode(MODE2);
+            initialize();
             break;
         
         case SETMODE3:
