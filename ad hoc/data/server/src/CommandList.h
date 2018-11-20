@@ -68,6 +68,9 @@
 #define SET_MODE2 0x12
 #define SET_MODE3 0x13
 
+#define GET_MODE 0x17
+#define GET_ALL_DATA 0x19
+
 
 /*
  * setting packet location

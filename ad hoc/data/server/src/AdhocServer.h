@@ -53,4 +53,6 @@ void read_file();
 void reinitialize(int src, int dst);
 void set_mode2(int src, int dst);
 void set_mode3(int src, int dst);
+int get_mode(int src, int dst);
+int get_all_data(int src, int dst);
 #endif

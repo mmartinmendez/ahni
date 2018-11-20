@@ -1,63 +1,8 @@
 #include <EEPROM.h>
 #include "PacketSerial.h"
+#include "variables.h"
+#include "prototype.h"
 //#include "WiFiUdp.h"
-
-#define STARTBYTE 0xFF
-#define PACKETSIZE 254
-#define MINPACKET 8
-#define TCP 1
-#define ADHOC 0
-#define FWD 0
-#define ACK 1
-#define ADDRESS 0
-#define MOTOR_FRONT_LEFT_P  35
-#define MOTOR_FRONT_LEFT_N  33
-#define MOTOR_BACK_LEFT_P  27
-#define MOTOR_BACK_LEFT_N  25
-#define MOTOR_FRONT_RIGHT_P 39
-#define MOTOR_FRONT_RIGHT_N  37
-#define MOTOR_BACK_RIGHT_P  31
-#define MOTOR_BACK_RIGHT_N    29
-#define ULTRASONIC_FRONT_TRIGGER   43
-#define ULTRASONIC_FRONT_ECHO   41
-
-#define REDLED A11
-#define WHITELED 44
-#define YELLOWLED A12
-#define ORANGELED 42
-
-
-#define TIMER1COUNT 64286  //50Hz
-#define TIMER3COUNT 65536  //1Hz
-
-//External commands, communicated with another robot (in Adhoc mode) or TCP
-#define NOCOMMAND 0
-#define MOVEFORWARD 0x01
-#define MOVEFORWARDTIME 0x02
-#define MOVEBACK 0x03
-#define MOVEBACKTIME 0x04
-#define TURNLEFT 0x05
-#define TURNRIGHT 0x06
-#define STOP 0x07
-#define DISTANCEFRONT 0x0A
-#define GETHEADING 0x0D 
-#define GETID 0x0F
-#define REINITIALIZE 0x11
-#define SET_MODE2 0x12
-#define SET_MODE3 0x13
-
-#define MODE2 0x14
-#define MODE3 0x15
-
-//Internal commands, communicated with ESP32
-#define INT_ID 0x01
-#define INT_SSID_PWD 0x02
-#define INT_MATRIX 0x03
-#define INT_RSSI 0x04
-#define INT_IP 0x05
-#define INT_DEMO 0x06
-
-#define NODECOUNT 16
 
 //Matrix - Robot ID 0 to ID 15
 uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
@@ -68,7 +13,7 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {1,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0},
                                       {0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,1},
                                       {0,1,0,0,0,1,1,0,0,1,0,0,0,0,1,0},
-                                      {1,0,0,0,0,0,0,1,1,1,0,1,0,1,0,0},
+                                      {1,1,0,0,0,0,0,1,1,1,0,1,0,1,0,0},
                                       {1,1,0,0,0,0,1,0,1,1,1,0,0,0,1,0},
                                       {1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,1},
                                       {0,1,0,0,0,1,0,0,0,1,1,0,0,1,0,0},
@@ -76,17 +21,16 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {1,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0},
                                       {0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
-char ssid[] = "DBabu";
-char password[] = "12345678";
-char ip[] = {192,168,43,250};
-// char slaveip[]={192,168,0,1};
+
+char ssid[] = "FRITZ!Box Fon 7360 - extended";
+char password[] = "03642107286265336252";
+char ip[] = {192,168,178,180};
 
 //gnrl ip = 192.168.43.251
 //bot9 ip = 192.168.43.165
 //bot1 ip = 192.168.43.99
 
 uint8_t Command = 0;
-uint8_t Mode = 0;
 long Rssi = 0;
 unsigned long distance = 0;
 
@@ -112,7 +56,6 @@ unsigned long sendTimer = 2000;
 uint8_t rssiBuffer[20];
 uint8_t rssiCounter = 0;
 
-
 //Handle commands. USER CAN ADD MODE COMMANDS IF NECESSARY
 void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uint8_t fwd, uint8_t counterH, uint8_t counterL, uint8_t aalen, uint8_t command, uint8_t *data)
 {
@@ -121,57 +64,89 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
     data = data + 1;
     switch(command)
     {
-      case MOVEFORWARD : Command = MOVEFORWARD;
-                        moveForward();
-                        break;
+        case MOVEFORWARD : 
+            Command = MOVEFORWARD;
+            moveForward();
+            break;
 
-      case MOVEFORWARDTIME: moveForwardForTime(*data);
-                            break;
+        case MOVEFORWARDTIME: 
+            moveForwardForTime(*data);
+            break;
 
-      case MOVEBACK: Command = MOVEBACK; 
-                     moveBack();
-                     break;
+        case MOVEBACK: 
+            Command = MOVEBACK; 
+            moveBack();
+            break;
                      
-      case MOVEBACKTIME: moveBackForTime(*data);
-                         break;
+        case MOVEBACKTIME: 
+            moveBackForTime(*data);
+            break;
                          
-      case STOP: Command = STOP; 
-                 stopMotors();
-                 break;
+        case STOP: 
+            Command = STOP; 
+            stopMotors();
+            break;
                 
-      case TURNLEFT: turnLeft(*data);
-                     break;
+        case TURNLEFT: 
+            turnLeft(*data);
+            break;
 
-      case TURNRIGHT: turnRight(*data);
-                      break;
+        case TURNRIGHT: 
+            turnRight(*data);
+            break;
 
-      case DISTANCEFRONT: distance = getDistanceFront();
-                          if(distance > 254)
-                          {
-                           distance = 254;
-                          }
-                          tempData[0] = command;
-                          tempData[1] = distance & 0xFF;
-                          tempData[2] = 0;
-                          sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
-                          break;
+        case DISTANCEFRONT: 
+            distance = getDistanceFront();
+            if(distance > 254)
+            {
+                distance = 254;
+            }
+            tempData[0] = command;
+            tempData[1] = distance & 0xFF;
+            tempData[2] = 0;
+            sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
+            break;
 
-      case GETHEADING: break;   
+        case GETHEADING: break;   
 
-      case GETID: nodeID = getID();
-                  tempData[0] = command;
-                  tempData[1] = nodeID;
-                  sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
-                  break; 
+        case GETID: 
+            nodeID = getID();
+            tempData[0] = command;
+            tempData[1] = nodeID;
+            sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, tempData);
+            break; 
       
-      case REINITIALIZE:
-        break;
+        case GETMODE: 
+            data = get_mode(command, tempData);
+            sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, data);
+            break;
       
-      case SET_MODE2:
-        break;
+        case REINITIALIZE:
+            reinitialize();
+            break;
+      
+        case SET_MODE2:
+            set_mode(MODE2);
+            initializeAdhocMode();
+            break;
 
-      case SET_MODE3:
-        break;
+        case SET_MODE3:
+            set_mode(MODE3);
+            break;
+        case GETDATA:
+            data = get_data(src, dst, tempData);
+            // tempData[0] = Command;
+            // getRSSI();
+            // tempData[1] = RSSI_Value;
+            // getRSSI();
+            // tempData[2] = RSSI_Value;
+            // getRSSI();
+            // tempData[3] = RSSI_Value;
+            // Serial.println(tempData[1]);
+            // Serial.println(tempData[2]);
+            // Serial.println(tempData[3]);
+            sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, data);
+            break;
     }
   }
 
@@ -184,28 +159,26 @@ ISR(TIMER1_OVF_vect)
  switch(Command)
  {
 
-  case MOVEFORWARDTIME:
-  case TURNLEFT:
-  case TURNRIGHT:
-  case MOVEBACKTIME:
-  if(((uint16_t)(millis()/1000) - tempMovementTime) >= movementTime)
-                      {
-                        stopMotors();  
-                        Command = NOCOMMAND; 
-                      }
-                     break;
+    case MOVEFORWARDTIME:
+    case TURNLEFT:
+    case TURNRIGHT:
+    case MOVEBACKTIME:
+        if(((uint16_t)(millis()/1000) - tempMovementTime) >= movementTime)
+        {
+            stopMotors();  
+            Command = NOCOMMAND; 
+        }
+        break;
+    case INITIALIZE:
+        if(((uint16_t)millis() - tempInitTime) >= initTime)
+        {
+            stopMotors();
+            Command = NOCOMMAND;
+        }
+        break;
  }
 
  TCNT1 = TIMER1COUNT;
-}
-
-ISR(TIMER3_OVF_vect) 
-{
-  long time = millis();
-
-  sendRSSI(nodeID, 1, ADHOC);
-
-  TCNT3 = TIMER3COUNT;
 }
 
 void initGPIO()
@@ -241,16 +214,9 @@ void initTimer()
   TCCR1B |= (1 << CS12);
   TIMSK1 |= (1 << TOIE1);
 
-  // Timer 3 setup
-  TCCR3A = 0;
-  TCCR3B = 0;
-
-  TCNT3 = TIMER3COUNT;
-  TCCR3B |= (1 << CS12);
-  TIMSK3 |= (1 << TOIE1);
-
   interrupts();
 }
+
 
 //Set LEDs
 void setLED(uint8_t led, bool state)
@@ -405,13 +371,6 @@ void getRSSI()
   //RSSI value is updated in RSS_Value variable as soon as there is reply from ESP32. This is implemented in OnPacket() function
 }
 
-void sendRSSI(uint8_t src, uint8_t dst, uint8_t connection) 
-{
-  getRSSI();
-  uint8_t value = RSSI_Value;
-  CreatePacket(src, dst, connection, sizeof(value), &value);
-}
-
 //This is internal API used to enable demo mode in ESP32. Demo mode should be enabled in all the robots to make it work
 void enableDemo()
 {
@@ -560,6 +519,8 @@ void setup()
 Serial.begin(115200);
 setID(9);
 nodeID = getID();
+Mode = MODE1;
+initialized = 0;
 packetSerial.setPacketHandler(&onPacket);
 packetSerial.begin(115200);
 initGPIO();

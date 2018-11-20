@@ -206,7 +206,7 @@ long get_RSSI(int src,int dst) {
     memset(client_message,'\0',1024);
     
 #ifdef __DEBUG__
-    printf("Receving from sockfd - %d\n",client_sock[client_index]);
+    printf("Receving from sockfd - %d - %d\n",client_sock[client_index], client_index);
 #endif
     ret = recv(client_sock[client_index] , client_message ,1024, 0);
     value = get_data(client_message);
@@ -217,6 +217,27 @@ long get_RSSI(int src,int dst) {
 #endif
     
     return (value[0] << 24 ) | (value[1] << 16) | (value[2] << 8) | (value[3]);
+}
+
+int get_mode(int src, int dst) {
+        int ret = 0;
+        unsigned char *value = NULL;
+        char data;
+        int client_index = get_index(dst_id);
+        
+        data = GET_MODE;
+        create_packet(src,dst,sizeof(data),&data);
+        memset(client_message, '\0', 1024);
+        ret = recv(client_sock[client_index], client_message, 1024, 0);
+        value = get_data(client_message);
+
+    #ifdef __DEBUG__
+        printf("%x %x %x %x\n",value[0],value[1],value[2],value[3]);
+        printf("%x %x %x %x\n",value[0]<<24,value[1]<<16,value[2]<<8,value[3]);
+        printf("%d", (value[0] << 24 ) | (value[1] << 16) | (value[2] << 8) | (value[3]));
+    #endif
+
+        printf("%d\n", value[0]);
 }
 
 /* 
@@ -462,6 +483,31 @@ void set_mode2(int src, int dst) {
 void set_mode3(int src, int dst) {
     char data = SET_MODE3;
     create_packet(src,dst,sizeof(data),&data);
+}
+
+int get_all_data(int src, int dst) {
+    int ret = 0;
+    unsigned char *value = NULL;
+    char data;
+    int client_index = get_index(dst_id);
+    
+    data = GET_ALL_DATA;
+    create_packet(src,dst,sizeof(data),&data);
+    memset(client_message, '\0', 1024);
+    ret = recv(client_sock[client_index], client_message, 1024, 0);
+    value = get_data(client_message);
+
+#ifdef __DEBUG__
+    printf("%x %x %x %x %x %x\n",value[0],value[1],value[2],value[3],value[4],value[5]);
+    printf("%x %x %x %x %x %x\n",value[6],value[7],value[8],value[9],value[10],value[11]);
+    printf("%x %x %x %x %x %x\n",value[12],value[13],value[14],value[15],value[16],value[17]);
+    printf("%x %x %x %x %x %x\n",value[18],value[19],value[20],value[21],value[22],value[23]);
+    printf("%x %x %x %x %x %x\n",value[24],value[25],value[26],value[27],value[28],value[29]);
+    printf("%x %x %x %x\n",value[0]<<24,value[1]<<16,value[2]<<8,value[3]);
+    printf("%d", (value[0] << 24 ) | (value[1] << 16) | (value[2] << 8) | (value[3]));
+#endif
+
+    printf("%d\n", value[0]);
 }
 
 

@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>    
+#include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h> 
 #include <unistd.h>   
@@ -121,6 +121,8 @@ int main(int argc , char *argv[])
         printf("  12. Put Robots into mode 2 (for running exercise 2)\n");
         printf("  13. Reinitialize\n");
         printf("  14. Put Robots into mode 3 (for running exercise 3\n)");
+        printf("  15. Get the mode of the bot\n");
+        printf("  16. Get all the data\n");
         printf(" Waiting for user input : "); 
 
         scanf("%d",&cmd_val);        
@@ -175,6 +177,7 @@ int main(int argc , char *argv[])
                 break;
             case 10:
                 printf("Fetchng ID\n");
+                get_botID(9);
                 printf("ID of the bot : %d\n",BOT_ID[bot_num]);
                 break;
             case 11:
@@ -191,6 +194,14 @@ int main(int argc , char *argv[])
             case 14:
                 set_mode3(src_id, dst_id);
                 printf("Mode 3 has been initialized. The slave will keep the same distance from the AP as the master. \n");
+                break;
+            case 15:
+                printf("Fetching mode\n");
+                get_mode(src_id, dst_id);
+                break;
+            case 16:
+                printf("Getting all data\n");
+                get_all_data(src_id, dst_id);
                 break;
             default:
                 printf("Unknown command received\n");
