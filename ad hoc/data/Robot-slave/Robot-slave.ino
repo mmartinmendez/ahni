@@ -97,9 +97,10 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             break; 
         
         case SETMODE:
-            setMode(data);
+            setMode(data[0]);
             Serial.println("----Slave---");
             Serial.println(data[0]);
+            Serial.println(Mode);
             Serial.println("------------");
             initialize();
             break;
