@@ -99,6 +99,8 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
         case SETMODE:
             setMode(data[0]);
             Serial.println("----Slave---");
+            sensorDistance = getDistanceFront();
+            Serial.println(sensorDistance);
             Serial.println(data[0]);
             Serial.println(Mode);
             Serial.println("------------");
