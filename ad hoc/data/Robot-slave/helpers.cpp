@@ -6,7 +6,7 @@ long distance[6] = {0,50,100,150,200,250};
 long RSSIValues[6] = {-54, -56, -60, -58, -63, -66};
 long RSSIMaster[6] = {-52, -58, -60, -63, -65, -72};
 long RSSIValuesWithDistance[6];
-long finalSlaveRSSI = RSSI_Value;
+long finalSlaveRSSI;
 long finalMasterRSSI = 0;
 int initialized=0;
 uint8_t Mode = 0;
@@ -58,7 +58,6 @@ void calculateDistance()
     }
     if(Mode==MODE3)
     {
-        finalMasterRSSI= -70;
         getLocation_mode3(finalMasterRSSI);
         getRSSI();
         finalSlaveRSSI= RSSI_Value;
@@ -76,41 +75,6 @@ void calculateDistance()
             Command = REQRSSI;
             moveBack();
         }
-
-
-        //RSSIchange = initMasterRSSI - finalMasterRSSI;
-        //reqSlaveRSSI = finalSlaveRSSI - RSSIchange;
-        
-        
-        
-        //initMasterRSSI=finalMasterRSSI;
-        // for(int i=0;i<6;i++)
-        // {
-        //     if(reqSlaveRSSI <= RSSIValues[i] && reqSlaveRSSI > RSSIValues[i+1])
-        //     {
-        //         if(RSSIchange<0)
-        //         {
-        //           reqSlaveRSSI=RSSIValues[i];
-        //           break;
-        //         }
-        //         else
-        //         {
-        //           reqSlaveRSSI=RSSIValues[i+1];
-        //           break;
-        //         }
-        //     }
-        // }
-        // Command = REQRSSI;
-        // if(RSSIchange>0)
-        // {
-        //     moveBack();
-        // }
-        // else
-        // {
-        //     moveForward();
-        // }
-
-
     }
 }
 

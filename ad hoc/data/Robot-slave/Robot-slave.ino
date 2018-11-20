@@ -31,6 +31,10 @@ unsigned long sensorDistance = 0;
 uint8_t nodeID = 0;
 uint8_t movementTime = 0;
 uint16_t tempMovementTime = 0;
+uint16_t initTime;
+uint16_t tempInitTime;
+int RSSIchange;
+long reqSlaveRSSI;
 
 uint16_t PacketCounter = 0;
 long RSSI_Value = 0;

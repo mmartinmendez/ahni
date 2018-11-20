@@ -12,8 +12,8 @@ void moveBack();
 
 //Global variables
 extern long RSSIValues[6];
-extern uint8_t tempInitTime;
-extern uint8_t initTime;
+extern uint16_t tempInitTime;
+extern uint16_t initTime;
 extern long RSSIMaster[6];
 extern long finalMasterRSSI;
 extern unsigned long sensorDistance;
