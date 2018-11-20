@@ -14,6 +14,7 @@ ISR(TIMER3_OVF_vect)
 {
     long time = millis();
     sendRSSI(nodeID, 1, ADHOC);
+    Serial.println("rssi being sent \n");
     TCNT3 = TIMER3COUNT;
 }
 
@@ -75,8 +76,10 @@ void set_mode(uint8_t newMode)
 void sendRSSI(uint8_t src, uint8_t dst, uint8_t connection) 
 {
     getRSSI();
-    uint8_t value = RSSI_Value;
-    CreatePacket(src, dst, connection, sizeof(value), &value);
+    uint8_t value[] = {0,0};
+    value[0] = 0x12;
+    value[1] = RSSI_Value;
+    CreatePacket(src, dst, connection, sizeof(value), value);
 }
 
 // Get the current data from the bot 

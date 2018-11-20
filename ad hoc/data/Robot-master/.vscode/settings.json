@@ -3,7 +3,13 @@
         "system_error": "cpp",
         "type_traits": "cpp",
         "array": "cpp",
-        "prototype.h": "c"
+        "prototype.h": "c",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "initializer_list": "cpp",
+        "list": "cpp",
+        "unordered_set": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Enabled"
 }

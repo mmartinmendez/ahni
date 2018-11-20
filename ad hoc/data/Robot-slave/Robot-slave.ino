@@ -22,8 +22,7 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
 char ssid[] = "DBabu";
 char password[] = "12345678";
-char ip[] = {192,168,178,181};
-char masterip[]={192,168,43,165};
+char ip[] = {192,168,43,165};
 
 uint8_t Command = 0;
 long Rssi = 0;
@@ -102,7 +101,9 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             break;
 
         case MASTERRSSI:
+            Serial.println("inside masterrssi");
             finalMasterRSSI = data;
+            Command = MASTERRSSI;
             calculateDistance();
             break;
     }
@@ -464,7 +465,7 @@ void setup()
 {
 Serial.begin(115200);
 Serial.println("starting robot");
-//setID(15);
+setID(1);
 nodeID = getID();
 Mode = MODE1;
 packetSerial.setPacketHandler(&onPacket);

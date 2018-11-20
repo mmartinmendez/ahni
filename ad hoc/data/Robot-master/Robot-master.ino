@@ -24,7 +24,7 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
 
 char ssid[] = "DBabu";
 char password[] = "12345678";
-char ip[] = {192,168,43,251};
+char ip[] = {192,168,43,250};
 
 //gnrl ip = 192.168.43.251
 //bot9 ip = 192.168.43.165
@@ -133,20 +133,12 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
         case SET_MODE3:
             set_mode(MODE3);
             break;
+            
         case GETDATA:
             data = get_data(src, dst, tempData);
-            // tempData[0] = Command;
-            // getRSSI();
-            // tempData[1] = RSSI_Value;
-            // getRSSI();
-            // tempData[2] = RSSI_Value;
-            // getRSSI();
-            // tempData[3] = RSSI_Value;
-            // Serial.println(tempData[1]);
-            // Serial.println(tempData[2]);
-            // Serial.println(tempData[3]);
             sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, data);
             break;
+
         case GETDISTANCEMS:
             moveForward();
             tempInitTime = (uint16_t)millis();
