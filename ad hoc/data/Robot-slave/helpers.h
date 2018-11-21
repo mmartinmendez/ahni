@@ -6,6 +6,8 @@ void initialize();
 void setMode(uint8_t mode);
 long getLocation(long rssi) ;
 void getNewRSSI(long slave, long master);
+void moveForward();
+void moveBack();
 
 //Global variables
 extern long RSSIValues[7];

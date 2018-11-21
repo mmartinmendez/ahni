@@ -4,6 +4,7 @@
 
 long distance[7] = {0,50,100,150,200,250,300};
 int RSSIValuesWithDistance[7];
+int RSSISlaveWithDistance[7];
 long finalSlaveRSSI = RSSI_Value;
 long finalMasterRSSI = 0;
 uint8_t Mode = 0;
@@ -29,17 +30,26 @@ void calculateDistance()
 {
     for(int i=0;i<6;i++)
     {
-        Serial.println(finalSlaveRSSI);
-        Serial.println("---------");
         if(finalMasterRSSI <= RSSIValuesWithDistance[i] && finalMasterRSSI > RSSIValuesWithDistance[i+1])
         {
             long locationMaster = getLocation(finalMasterRSSI);
-            getRSSI();
             long locationSlave = getLocation(RSSI_Value);
-            if((locationSlave - locationMaster) > sensorDistance + 5 && (locationSlave - locationMaster) < sensorDistance - 5)
+            if((locationSlave - locationMaster) > sensorDistance + 15 && (locationSlave - locationMaster) < sensorDistance - 15)
             {
                 getNewRSSI(locationSlave, locationMaster);
+                if(finalSlaveRSSI > RSSI_Value)
+                {
+                    moveForward();
+                }
+                else 
+                {
+                    moveBack();
+                }
             }
+        }
+        else 
+        {
+            finalSlaveRSSI = RSSI_Value;
         }
     }
 }
@@ -53,11 +63,12 @@ long getLocation(long rssi)
     {
         if(rssi <= RSSIValuesWithDistance[i] && rssi > RSSIValuesWithDistance[i+1])
         {
-            ratio = (RSSI_Value-RSSIValuesWithDistance[i+1])/(RSSIValuesWithDistance[i]-RSSIValuesWithDistance[i+1]);
+            // ratio = (double)(RSSI_Value-RSSIValuesWithDistance[i+1])/(double)(RSSIValuesWithDistance[i]-RSSIValuesWithDistance[i+1]);
             index = i;
         }
     }
-    location = (distance[index+1]-distance[index])/ratio + distance[index];
+    // location = (double)(distance[index+1]-distance[index])/ratio + distance[index];
+    location = distance[index+1];
     return location;
 }
 
@@ -72,13 +83,10 @@ void getNewRSSI(long slave, long master)
     {
         if(finalDistance >= distance[i] && finalDistance < distance[i+1])
         {
-            ratio = (finalDistance-distance[i+1])/(distance[i+1]-distance[i]);
+            // ratio = (double)(finalDistance-distance[i+1])/(double)(distance[i+1]-distance[i]);
             index = i;
         }
     }
-    Serial.println("-----");
-    Serial.println(RSSIValuesWithDistance[index]);
-    Serial.println(RSSIValuesWithDistance[index+1]);
-    Serial.println(ratio);
-    finalSlaveRSSI = (RSSIValuesWithDistance[index]-RSSIValuesWithDistance[index+1])/ratio + RSSIValuesWithDistance[index+1];
+    // finalSlaveRSSI = (double)(RSSIValuesWithDistance[index]-RSSIValuesWithDistance[index+1])/ratio + RSSIValuesWithDistance[index+1];
+    finalSlaveRSSI = RSSIValuesWithDistance[index];
 }

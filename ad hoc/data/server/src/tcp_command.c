@@ -467,22 +467,23 @@ void reinitialize(int src, int dst) {
 
 /*
  * Function to create packet to set 
- * robots to mode 2
+ * robots to mode val
  */
 
-void set_mode2(int src, int dst) {
-    char data = SET_MODE2;
-    create_packet(src,dst,sizeof(data),&data);
-}
-
-/*
- * Function to create packet to set 
- * robots to mode 3
- */
-
-void set_mode3(int src, int dst) {
-    char data = SET_MODE3;
-    create_packet(src,dst,sizeof(data),&data);
+void set_mode(int src, int dst, int mode) {
+    uint8_t data[2];
+    data[0] = SETMODE;
+    if(mode == 2) 
+    {
+        data[1] = MODE2;
+    } 
+    else if(mode == 3)
+    {
+        data[1] = MODE3;
+    }
+    printf("%x \n", data[0]);
+    printf("%x \n", data[1]);
+    create_packet(src,dst,sizeof(data),data);
 }
 
 void init_move_distance(int src, int dst)

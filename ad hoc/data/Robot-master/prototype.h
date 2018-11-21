@@ -10,3 +10,5 @@ void initializeAdhocMode();
 void moveForward();
 char *get_data(uint8_t src, uint8_t dst, uint8_t *tempData);
 void sendPacket(uint8_t src, uint8_t dst, uint8_t internal, uint8_t isTCP, uint8_t isACK, uint8_t counterHigh, uint8_t counterLow, uint8_t dataLength, uint8_t *data);
+void sendToSlave(uint8_t src, uint8_t dst, uint8_t command);
+void initialize();

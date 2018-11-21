@@ -22,9 +22,9 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
 
-char ssid[] = "DBabu";
-char password[] = "12345678";
-char ip[] = {192,168,43,250};
+char ssid[] = "FRITZ!Box Fon WLAN 7360";
+char password[] = "03642107286265336252";
+char ip[] = {192,168,178,93};
 
 //gnrl ip = 192.168.43.251
 //bot9 ip = 192.168.43.165
@@ -39,13 +39,16 @@ uint8_t slaveID = 1;
 uint8_t movementTime = 0;
 uint16_t tempMovementTime = 0;
 
+uint16_t sendTime = 0;
+uint16_t tempSendTime = 0;
+
 uint16_t PacketCounter = 0;
 long RSSI_Value = 0;
 
 PacketSerial packetSerial;
 //WiFiUDP wifiudp;
 
-uint8_t a[2];
+unsigned int counter = 0;
 
 //Custom variables
 //Timers in ms
@@ -118,20 +121,34 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
       
         case GETMODE: 
             data = get_mode(command, tempData);
-            sendPacket(dst, src, internal, tcp, ACK, counterH, counterL, 2, data);
+            CreatePacket(dst, src, tcp, 2, data);
             break;
       
         case REINITIALIZE:
+            Serial.println("reinitialize start");  
             reinitialize();
+            Serial.println("reinitialize end");    
+            Command = NOCOMMAND;        
             break;
       
-        case SET_MODE2:
-            set_mode(MODE2);
-            initializeAdhocMode();
+        case SETMODE:
+            tempData[0] = SETMODE;
+            if(data[0] == 38)
+            {
+                set_mode(MODE2);
+                tempData[1] = MODE2; 
+            }
+            else if(data[0] == 39) 
+            {
+                set_mode(MODE3);
+                tempData[1] = MODE3;
+            }
+            CreatePacket(dst, slaveID, ADHOC, 2, tempData);
             break;
 
-        case SET_MODE3:
-            set_mode(MODE3);
+        case INIT:
+            Serial.println("Initializing Master ......");
+            initialize();
             break;
             
         case GETDATA:
@@ -143,6 +160,12 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             moveForward();
             tempInitTime = (uint16_t)millis();
             Command = INITIALIZE;
+        
+        case SETINITDISTANCE:
+            Serial.println("Intial ditance being set");
+            tempData[0] = SETDISTANCE;
+            CreatePacket(dst, slaveID, ADHOC, 1, tempData);
+            break;
     }
   }
 
@@ -166,13 +189,50 @@ ISR(TIMER1_OVF_vect)
         }
         break;
     case INITIALIZE:
-        if(((uint16_t)millis() - tempInitTime) >= initTime)
+        if(counter < 7) 
+        {
+            if(((uint16_t)millis() - tempRssiTime) >= 1400)
+            {
+                stopMotors();
+                getRSSI();
+                RSSIValuesWithDistance[counter] = RSSI_Value;
+                tempRssiTime = millis();
+                counter = counter + 1;
+                moveForward();
+            }
+        }
+        else
         {
             stopMotors();
+            uint8_t tempData[32] = {0};
+            tempData[0] = 0x45;
+            tempData[1] = RSSIValuesWithDistance[0];
+            tempData[2] = RSSIValuesWithDistance[1];
+            tempData[3] = RSSIValuesWithDistance[2];
+            tempData[4] = RSSIValuesWithDistance[3];
+            tempData[5] = RSSIValuesWithDistance[4];
+            tempData[6] = RSSIValuesWithDistance[5];
+            tempData[7] = RSSIValuesWithDistance[6];
+            Serial.println("Array obtained");
+            Serial.println("Sending packet\n");
+            CreatePacket(nodeID, slaveID, ADHOC, 8, tempData);
             Command = NOCOMMAND;
+            // initializeAdhocMode();
         }
         break;
+    default:
+        if(Mode == MODE2)
+        {
+            if(((uint16_t)millis() - tempSendTime) >= 1000)
+            {
+                getRSSI();
+                Serial.println(RSSI_Value);
+                sendRSSI(nodeID, 1, ADHOC);
+                tempSendTime = millis();
+            }
+        }
  }
+ 
 
  TCNT1 = TIMER1COUNT;
 }
@@ -533,6 +593,10 @@ sendSSIDandPassword();
 startTimer = millis();
 sendTimerInit = millis();
 
+getRSSI();
+
+stopMotors();
+
 //WiFi UDP Setup
 //wifiudp.begin(slaveip,3333);
 //wifiudp.setupUDP(slaveip,3333);
@@ -552,21 +616,6 @@ uint8_t i = 0;
 void loop() 
 {
   packetSerial.update();
-  // if(millis()-startTimer >= endTimer) {
-  //   startTimer = millis();
-  //   getRSSI();
-  //   rssiBuffer[i++] = RSSI_Value;
-  // }
-  // if(millis() - sendTimerInit >= sendTimer) {
-    // sendRSSI(nodeID, slaveID, 0);
-    // i = 0;
-    // sendTimerInit = millis();
-    // for(uint8_t j = 0; j<20 ; j++) {
-    //   Serial.print(rssiBuffer[j]);
-    //   Serial.print(" ");
-    // }
-  //   Serial.println("");
-  // }
 }
 /** USER FUNCTION FOR AD-HOC NETWORKS COURSE. Create function and send over WiFi network
 src -> ID of robot. Send nodeID variable here (This is don't care for TCP packet)

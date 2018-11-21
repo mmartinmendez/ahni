@@ -118,16 +118,18 @@ int main(int argc , char *argv[])
         printf("  9. Get RSSI value\n");
         printf("  10. Get ID\n");
         printf("  11. Execute commands from file (cmd_file.txt)\n");
-        printf("  12. Put Robots into mode 2 (for running exercise 2)\n");
+        printf("  12. Change bot mode\n");
         printf("  13. Reinitialize\n");
-        printf("  14. Put Robots into mode 3 (for running exercise 3\n)");
-        printf("  15. Get the mode of the bot\n");
-        printf("  16. Get all the data\n");
-        printf("  17. Move the bot 50 cms\n");
+        printf("  14. Get the mode of the bot\n");
+        printf("  15. Get all the data\n");
+        printf("  16. Move the bot 50 cms\n");
+        printf("  17. Set initial distance\n");
+        printf("  18. Initialize\n");
         printf(" Waiting for user input : "); 
 
         scanf("%d",&cmd_val);        
 
+        char data;
         switch(cmd_val) {
 
             case 1:
@@ -185,7 +187,9 @@ int main(int argc , char *argv[])
                 read_file();
                 break;
             case 12:
-                set_mode2(src_id, dst_id);
+                printf("What mode should the bot change to: ");
+                scanf("%d", &val);
+                set_mode(src_id, dst_id, val);
                 printf("Mode 2 has been initialized. Move the master to make the slave follow. \n");
                 break;
             case 13:
@@ -193,21 +197,28 @@ int main(int argc , char *argv[])
                 printf("The robots have been set to the default state. \n");
                 break;
             case 14:
-                set_mode3(src_id, dst_id);
-                printf("Mode 3 has been initialized. The slave will keep the same distance from the AP as the master. \n");
-                break;
-            case 15:
                 printf("Fetching mode\n");
                 get_mode(src_id, dst_id);
                 break;
-            case 16:
+            case 15:
                 printf("Getting all data\n");
                 get_all_data(src_id, dst_id);
                 break;
-            case 17:
+            case 16:
                 printf("Running the bot 50 cms\n");
                 init_move_distance(src_id, dst_id);
                 break;
+            case 17:
+                printf("Setting Initial distance\n");
+                data = SET_DISTANCE;
+                create_packet(src_id, dst_id, sizeof(data), &data);
+                break;
+            case 18:
+                printf("Initializing\n");
+                data = INIT;
+                create_packet(src_id, dst_id, sizeof(data), &data);
+                break;
+
             default:
                 printf("Unknown command received\n");
                 break;

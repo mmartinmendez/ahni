@@ -65,11 +65,16 @@
 #define GET_ID 0x0F
 #define SET_ID 0x10
 #define REINITIALIZE 0x11
-#define SET_MODE2 0x12
-#define SET_MODE3 0x13
+
+#define SETMODE 0x24
+#define MODE2 0x26
+#define MODE3 0x27
 
 #define GET_MODE 0x17
 #define GET_ALL_DATA 0x19
+
+#define SET_DISTANCE 0x31
+#define INIT 0x32
 
 
 /*

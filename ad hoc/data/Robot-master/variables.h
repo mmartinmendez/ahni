@@ -40,15 +40,19 @@
 #define GETID 0x0F
 #define GETMODE 0x17
 #define REINITIALIZE 0x11
-#define SET_MODE2 0x12
-#define SET_MODE3 0x13
 #define INITIALIZE 0x18
 #define GETDATA 0x19
-#define GETDISTANCEMS 0x30
 
-#define MODE1 0x14
-#define MODE2 0x15
-#define MODE3 0x16
+#define SETMODE 0x24
+#define MODE1 0x25
+#define MODE2 0x26
+#define MODE3 0x27
+
+#define GETDISTANCEMS 0x30
+#define SETINITDISTANCE 0x31
+
+#define SETDISTANCE 0x46
+#define INIT 0x32
 
 //Internal commands, communicated with ESP32
 #define INT_ID 0x01
@@ -68,4 +72,9 @@ extern uint8_t nodeID;
 extern int initialized;
 extern uint16_t tempInitTime;
 extern uint16_t initTime;
-// extern uint8_t RSSIValuesWithDistance[7];
+extern uint16_t rssiTime;
+extern uint16_t tempRssiTime;
+extern long RSSIValuesWithDistance[7];
+
+extern uint16_t sendTime;
+extern uint16_t tempSendTime;

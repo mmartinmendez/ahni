@@ -26,7 +26,7 @@ char ip[] = {192,168,178,81};
 
 uint8_t Command = 0;
 long Rssi = 0;
-unsigned long sensorDistance = 0;
+unsigned long sensorDistance = 30;
 
 uint8_t nodeID = 0;
 uint8_t movementTime = 0;
@@ -49,8 +49,6 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
 
     uint8_t tempData[32] = {0};
     data = data + 1;
-    Serial.println(command);
-    Serial.println(SETMODE);
     switch(command)
     {
       case MOVEFORWARD : Command = MOVEFORWARD;
@@ -103,7 +101,6 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             break;
         
         case SETDISTANCE:
-        Serial.println("gets here");
             if(Mode == MODE2)
             {
                 sensorDistance = getDistanceFront();
@@ -115,13 +112,10 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             }
 
         case MASTERRSSI:
-            Serial.println("---MASTERRSSI----");
-            Serial.println(Mode);
             finalMasterRSSI = (0xff << 24) | (0xff << 16) | (0xff << 8) | data[0];
-            Serial.println(finalMasterRSSI);
-            Serial.println("-------");
             Command = MASTERRSSI;
             calculateDistance();
+            Serial.println(finalSlaveRSSI);
             break;
         
         case RECEIVEARRAY:
@@ -155,10 +149,16 @@ ISR(TIMER1_OVF_vect)
             }
             break;
         case MASTERRSSI:
-            if(((uint8_t)millis() - tempRssiTime) >= rssiTime)
+            if(((uint8_t)millis() - tempRssiTime) >= 200)
             {
                 getRSSI();
-                if(RSSI_Value >= finalSlaveRSSI-1 && RSSI_Value <= finalSlaveRSSI+1)
+                unsigned long dist = getDistanceFront();
+                if(dist < sensorDistance)
+                {
+                    stopMotors();
+                }
+
+                if(RSSI_Value >= finalSlaveRSSI-10 && RSSI_Value <= finalSlaveRSSI+10)
                 {
                     stopMotors();
                 } 
@@ -516,6 +516,8 @@ delay(1000);
 sendIP();
 delay(1000);
 sendSSIDandPassword();
+
+getRSSI();
 
 //WiFi UDP Setup
 //wifiudp.begin(masterip,3333);
