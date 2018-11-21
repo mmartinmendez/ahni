@@ -20,9 +20,9 @@ uint8_t matrix[NODECOUNT][NODECOUNT]={{0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1},
                                       {1,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0},
                                       {0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1},
                                       {0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0}};
-char ssid[] = "FRITZ!Box Fon WLAN 7360";
-char password[] = "03642107286265336252";
-char ip[] = {192,168,178,81};
+char ssid[] = "DBabu";
+char password[] = "12345678";
+char ip[] = {192,168,43,165};
 
 uint8_t Command = 0;
 long Rssi = 0;
@@ -152,12 +152,6 @@ ISR(TIMER1_OVF_vect)
             if(((uint8_t)millis() - tempRssiTime) >= 200)
             {
                 getRSSI();
-                unsigned long dist = getDistanceFront();
-                if(dist < sensorDistance)
-                {
-                    stopMotors();
-                }
-
                 if(RSSI_Value >= finalSlaveRSSI-10 && RSSI_Value <= finalSlaveRSSI+10)
                 {
                     stopMotors();
