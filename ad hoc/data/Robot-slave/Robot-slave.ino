@@ -98,12 +98,7 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
         
         case SETMODE:
             setMode(data[0]);
-            Serial.println("----Slave---");
             sensorDistance = getDistanceFront();
-            Serial.println(sensorDistance);
-            Serial.println(data[0]);
-            Serial.println(Mode);
-            Serial.println("------------");
             initialize();
             break;
 
@@ -115,10 +110,12 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             break;
         
         case RECEIVEARRAY:
-            Serial.println(data[0]);
-            Serial.println(data[1]);
-            Serial.println(data[2]);
-            Serial.println((long)data[0]);
+            for(int i=0;i<7;i++)
+            {
+                RSSIValuesWithDistance[i] = (0xff << 24) | (0xff << 16) | (0xff << 8) | data[i];
+            }
+            Serial.println("Arra stored");
+            Serial.println(RSSIValuesWithDistance[0]);
             break;
 
     }

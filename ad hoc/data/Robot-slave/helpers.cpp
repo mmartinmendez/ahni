@@ -3,7 +3,7 @@
 #include "helpers.h"
 
 long distance[7] = {0,50,100,150,200,250,300};
-long RSSIValues[7] = {-40, -46, -55, -58, -63, -66, -70};
+int RSSIValuesWithDistance[7];
 long finalSlaveRSSI = RSSI_Value;
 long finalMasterRSSI = 0;
 uint8_t Mode = 0;
@@ -39,7 +39,7 @@ void calculateDistance()
     {
         Serial.println(finalSlaveRSSI);
         Serial.println("---------");
-        if(finalMasterRSSI <= RSSIValues[i] && finalMasterRSSI > RSSIValues[i+1])
+        if(finalMasterRSSI <= RSSIValuesWithDistance[i] && finalMasterRSSI > RSSIValuesWithDistance[i+1])
         {
             long locationMaster = getLocation(finalMasterRSSI);
             getRSSI();
@@ -59,9 +59,9 @@ long getLocation(long rssi)
     int index = 0;
     for(int i=0;i<6;i++)
     {
-        if(rssi <= RSSIValues[i] && rssi > RSSIValues[i+1])
+        if(rssi <= RSSIValuesWithDistance[i] && rssi > RSSIValuesWithDistance[i+1])
         {
-            ratio = (RSSI_Value-RSSIValues[i+1])/(RSSIValues[i]-RSSIValues[i+1]);
+            ratio = (RSSI_Value-RSSIValuesWithDistance[i+1])/(RSSIValuesWithDistance[i]-RSSIValuesWithDistance[i+1]);
             index = i;
         }
     }
@@ -85,8 +85,8 @@ void getNewRSSI(long slave, long master)
         }
     }
     Serial.println("-----");
-    Serial.println(RSSIValues[index]);
-    Serial.println(RSSIValues[index+1]);
+    Serial.println(RSSIValuesWithDistance[index]);
+    Serial.println(RSSIValuesWithDistance[index+1]);
     Serial.println(ratio);
-    finalSlaveRSSI = (RSSIValues[index]-RSSIValues[index+1])/ratio + RSSIValues[index+1];
+    finalSlaveRSSI = (RSSIValuesWithDistance[index]-RSSIValuesWithDistance[index+1])/ratio + RSSIValuesWithDistance[index+1];
 }

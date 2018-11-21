@@ -16,6 +16,7 @@ extern uint8_t Mode;
 extern long RSSI_Value;
 extern uint8_t rssiTime;
 extern uint16_t tempRssiTime;
+extern int RSSIValuesWithDistance[7];
 
 #define STARTBYTE 0xFF
 #define PACKETSIZE 254
