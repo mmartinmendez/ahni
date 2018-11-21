@@ -64,6 +64,9 @@ extern uint16_t tempRssiTime;
 
 #define MASTERRSSI 0x31
 
+#define RECEIVEARRAY 0x45
+
+
 //Internal commands, communicated with ESP32
 #define INT_ID 0x01
 #define INT_SSID_PWD 0x02

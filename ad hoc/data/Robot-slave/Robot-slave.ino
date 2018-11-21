@@ -113,6 +113,14 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             Command = MASTERRSSI;
             calculateDistance();
             break;
+        
+        case RECEIVEARRAY:
+            Serial.println(data[0]);
+            Serial.println(data[1]);
+            Serial.println(data[2]);
+            Serial.println((long)data[0]);
+            break;
+
     }
 }
 
@@ -135,7 +143,7 @@ ISR(TIMER1_OVF_vect)
             }
             break;
         case MASTERRSSI:
-            if(((uint8_t)millis - tempRssiTime) >= rssiTime)
+            if(((uint8_t)millis() - tempRssiTime) >= rssiTime)
             {
                 getRSSI();
                 if(RSSI_Value >= finalSlaveRSSI-1 && RSSI_Value <= finalSlaveRSSI+1)
