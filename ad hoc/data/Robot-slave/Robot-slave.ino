@@ -103,6 +103,7 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             break;
         
         case SETDISTANCE:
+        Serial.println("gets here");
             if(Mode == MODE2)
             {
                 sensorDistance = getDistanceFront();
@@ -114,8 +115,11 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
             }
 
         case MASTERRSSI:
+            Serial.println("---MASTERRSSI----");
             Serial.println(Mode);
-            finalMasterRSSI = data;
+            finalMasterRSSI = (0xff << 24) | (0xff << 16) | (0xff << 8) | data[0];
+            Serial.println(finalMasterRSSI);
+            Serial.println("-------");
             Command = MASTERRSSI;
             calculateDistance();
             break;
