@@ -14,14 +14,6 @@ void initialize()
     getRSSI();
     tempRssiTime = millis();
 
-    if(Mode == MODE2)
-    {
-        sensorDistance = getDistanceFront();
-        if(sensorDistance > 254)
-        {
-            sensorDistance = 254;
-        }
-    }
     if(Mode == MODE3)
     {
         

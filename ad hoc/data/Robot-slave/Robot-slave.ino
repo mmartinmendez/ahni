@@ -98,9 +98,20 @@ void handleCommands(uint8_t src, uint8_t dst, uint8_t internal, uint8_t tcp, uin
         
         case SETMODE:
             setMode(data[0]);
-            sensorDistance = getDistanceFront();
+            Serial.println("Slave mode set.");
             initialize();
             break;
+        
+        case SETDISTANCE:
+            if(Mode == MODE2)
+            {
+                sensorDistance = getDistanceFront();
+                if(sensorDistance > 254)
+                {
+                    sensorDistance = 254;
+                }
+                Serial.println("Initial distance obtained");
+            }
 
         case MASTERRSSI:
             Serial.println(Mode);

@@ -66,6 +66,7 @@ extern int RSSIValuesWithDistance[7];
 #define MASTERRSSI 0x31
 
 #define RECEIVEARRAY 0x45
+#define SETDISTANCE 0x46
 
 
 //Internal commands, communicated with ESP32
